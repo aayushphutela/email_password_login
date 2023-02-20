@@ -289,9 +289,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return ("Enter Valid Phone Number");
         }
       },
-      onSaved: (value) {
-        mobileEditingcontroller.text = value!;
-      },
+      // onSaved: (value) {
+      //   mobileEditingcontroller.text = value!;
+      // },
       textInputAction: TextInputAction.next,
     );
     final collegeNameFeild = TextFormField(
