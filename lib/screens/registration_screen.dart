@@ -1,9 +1,9 @@
-
 import 'dart:io';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_password_login/models/user_model.dart';
 import 'package:email_password_login/screens/home_screen.dart';
+import 'package:email_password_login/screens/tempFile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +43,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     {"id": 2, "name": "Almuni"},
     {"id": 3, "name": "Faculty"},
   ];
-
 
   @override
   Widget build(BuildContext context) {
@@ -151,13 +150,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     //     );
     //   }
     // }
-
+final imageTypeFeild = ImageHere();
     final userTypeFeild = Container(
       // height: 60,
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
-        // color: AppColorTheme.lightGreyColor,
+          // color: AppColorTheme.lightGreyColor,
           borderRadius: BorderRadius.circular(10)),
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<String>(
@@ -195,7 +194,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           items: _myJson.map((Map map) {
             return new DropdownMenuItem<String>(
               value: map["name"].toString(),
-              child: new Text(map["name"],
+              child: new Text(
+                map["name"],
               ),
             );
           }).toList(),
@@ -233,10 +233,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           hintText: "Password",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
-
       autofocus: false,
       controller: passwordEditingcontroller,
-
       validator: (value) {
         RegExp regex = new RegExp(r'^.{6,}$');
         if (value!.isEmpty) {
@@ -249,7 +247,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       onSaved: (value) {
         passwordEditingcontroller.text = value!;
       },
-
       textInputAction: TextInputAction.done,
     );
     final nameFeild = TextFormField(
@@ -314,20 +311,22 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       textInputAction: TextInputAction.next,
     );
 
-
     final admissionYear = Column(
       children: [
         DropdownButtonFormField<int>(
-          items: sequenceNumbers.map((value) =>
-              DropdownMenuItem(
-                child: Text(
-                  '$value',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-
-                value: value,)).toList(),
-          hint: Align(alignment: Alignment.center,
-            child: Text('Year of admission'),),
+          items: sequenceNumbers
+              .map((value) => DropdownMenuItem(
+                    child: Text(
+                      '$value',
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                    value: value,
+                  ))
+              .toList(),
+          hint: Align(
+            alignment: Alignment.center,
+            child: Text('Year of admission'),
+          ),
           validator: (value) {
             if (value == null) {
               return 'Please Select your choice';
@@ -335,7 +334,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             return null;
           },
           value: selectedYear,
-
           onChanged: (int? newValue) {
             setState(() {
               selectedYear = newValue;
@@ -343,23 +341,27 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               print("PRINT VALUE=== $selectedYear");
             });
             print(selectedYear);
-          },),
+          },
+        ),
       ],
     );
-
 
     final passoutYearFeild = Column(
       children: [
         DropdownButton<int>(
-          items: sequenceNumbers.map((value) =>
-              DropdownMenuItem(
-                child: Text(
-                  '$value',
-                  style: TextStyle(color: Colors.redAccent),
-                )
-                , value: value,)).toList(),
-          hint: Align(alignment: Alignment.center,
-            child: Text('Passout year'),),
+          items: sequenceNumbers
+              .map((value) => DropdownMenuItem(
+                    child: Text(
+                      '$value',
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                    value: value,
+                  ))
+              .toList(),
+          hint: Align(
+            alignment: Alignment.center,
+            child: Text('Passout year'),
+          ),
           value: selectedYear,
           onChanged: (int? newValue) {
             setState(() {
@@ -368,7 +370,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               print("PRINT VALUE=== $selectedYear");
             });
             print(selectedYear);
-          },),
+          },
+        ),
       ],
     );
     final signUpButton = Material(
@@ -380,10 +383,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           signUp(emailEditingcontroller.text, passwordEditingcontroller.text);
         },
         padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery
-            .of(context)
-            .size
-            .width,
+        minWidth: MediaQuery.of(context).size.width,
         child: Text(
           'SignUp',
           textAlign: TextAlign.center,
@@ -452,12 +452,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       height: 25,
                     ),
 
-
-                    usertypeValue == "Student" ?
-                    admissionYear : SizedBox(),
-                    usertypeValue == "Almuni" ?
-                    passoutYearFeild : SizedBox(),
-
+                    usertypeValue == "Student" ? admissionYear : SizedBox(),
+                    usertypeValue == "Almuni" ? passoutYearFeild : SizedBox(),
 
                     SizedBox(
                       height: 25,
@@ -466,7 +462,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     SizedBox(
                       height: 25,
                     ),
+                    imageTypeFeild,
+                    SizedBox(
+                      height: 25,
+                    ),
                     signUpButton,
+
                   ],
                 ),
               ),
@@ -501,7 +502,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     userModel.uid = user.uid;
     userModel.name = nameEditingcontroller.text;
     userModel.password = passwordEditingcontroller.text;
-    userModel.phoneNumber = int.parse("$mobileEditingcontroller");
+    userModel.phoneNumber = int.parse(mobileEditingcontroller.text);
     userModel.collegeName = collegeEditingcontroller.text;
     userModel.year = int.parse("$selectedYear");
     userModel.userType = usertypeValue.toString();
@@ -515,6 +516,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     Navigator.pushAndRemoveUntil(
         (context),
         MaterialPageRoute(builder: (context) => HomeScreen()),
-            (route) => false);
+        (route) => false);
   }
+
 }

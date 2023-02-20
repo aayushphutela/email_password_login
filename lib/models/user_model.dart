@@ -13,7 +13,7 @@ class UserModel {
   // receiving data from server
   factory UserModel.fromMap(map) {
     return UserModel(
-      uid: map['uid'],
+      // uid: map['uid'],
       email: map['email'],
       name: map['name'],
       password: map['password'],
