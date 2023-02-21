@@ -44,119 +44,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     {"id": 3, "name": "Faculty"},
   ];
 
+  XFile? _image;
+  String? imageUrl;
   @override
   Widget build(BuildContext context) {
-    // Future<void> showOptionsDialog(BuildContext context) {
-    //   return showDialog(
-    //       context: context,
-    //       builder: (BuildContext context) {
-    //         return AlertDialog(
-    //           title: Text(
-    //             "Choose your option",
-    //             // style: AppTextTheme.homeRegular(16, true),
-    //           ),
-    //           content: SingleChildScrollView(
-    //             child: ListBody(
-    //               children: [
-    //                 GestureDetector(
-    //                   onTap: () {
-    //                     openCamera().then((value) {
-    //                       setState(() {
-    //                         print("UPload image");
-    //                       });
-    //                     });
-    //                   },
-    //                   child: Row(
-    //                     children: [
-    //                       Icon(
-    //                         Icons.camera_alt_rounded,
-    //                         // color: AppColorTheme.greyColor,
-    //                         size: 22,
-    //                       ),
-    //                       SizedBox(
-    //                         width: 5,
-    //                       ),
-    //                       Text(
-    //                         "Capture Image From Camera",
-    //                         // style: AppTextTheme.homeRegular(12, true),
-    //                       ),
-    //                     ],
-    //                   ),
-    //                 ),
-    //                 Padding(padding: EdgeInsets.all(10)),
-    //                 GestureDetector(
-    //                   onTap: () {
-    //                     openGallery().then((value) {
-    //                       setState(() {
-    //                         debugPrint("UPload iMaghe==");
-    //                         uploadImage();
-    //                       });
-    //                     });
-    //                   },
-    //                   child: Row(
-    //                     children: [
-    //                       const Icon(
-    //                         Icons.image,
-    //                         // color: AppColorTheme.greyColor,
-    //                         size: 23,
-    //                       ),
-    //                       SizedBox(
-    //                         width: 5,
-    //                       ),
-    //                       Text("Take Image From Gallery",
-    //                           // style: AppTextTheme.homeRegular(12, true)),
-    //                       ),],
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //           ),
-    //         );
-    //       });
-    // }
-    //
-    // Future openCamera() async {
-    //   var imgCamera = await imgPicker.getImage(source: ImageSource.camera);
-    //   setState(() {
-    //     imgFile = File(imgCamera!.path);
-    //   });
-    //   Navigator.of(context).pop();
-    // }
-    //
-    // Future openGallery() async {
-    //   var imgGallery = await imgPicker.getImage(source: ImageSource.gallery);
-    //   setState(() {
-    //     imgFile = File(imgGallery!.path);
-    //   });
-    //   Navigator.of(context).pop();
-    // }
-    //
-    // Widget displayImage() {
-    //   if (imgFile == null) {
-    //     return const CircleAvatar(
-    //       radius: 50,
-    //       child: CircleAvatar(
-    //         backgroundImage: AssetImage("assets/images/profileImage.png"),
-    //         radius: 50,
-    //       ),
-    //     );
-    //   } else {
-    //     return CircleAvatar(
-    //       radius: 50,
-    //       child: CircleAvatar(
-    //         backgroundImage: FileImage(imgFile!),
-    //         radius: 50,
-    //       ),
-    //     );
-    //   }
-    // }
-final imageTypeFeild = ImageHere();
+    final imageTypeFeild = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ImageFromGalleryEx(ImageSourceType.camera, (image, imgUrl) {
+          _image = image;
+          imageUrl = imgUrl;
+          setState(() {});
+        }),
+        ImageFromGalleryEx(ImageSourceType.gallery, (image, imgUrl) {
+          _image = image;
+          imageUrl = imgUrl;
+          setState(() {});
+        }),
+      ],
+    );
+    // ImageHere();
     final userTypeFeild = Container(
       // height: 60,
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
-          // color: AppColorTheme.lightGreyColor,
+        // color: AppColorTheme.lightGreyColor,
           borderRadius: BorderRadius.circular(10)),
       child: DropdownButtonHideUnderline(
         child: DropdownButtonFormField<String>(
@@ -316,12 +229,12 @@ final imageTypeFeild = ImageHere();
         DropdownButtonFormField<int>(
           items: sequenceNumbers
               .map((value) => DropdownMenuItem(
-                    child: Text(
-                      '$value',
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
-                    value: value,
-                  ))
+            child: Text(
+              '$value',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            value: value,
+          ))
               .toList(),
           hint: Align(
             alignment: Alignment.center,
@@ -351,12 +264,12 @@ final imageTypeFeild = ImageHere();
         DropdownButton<int>(
           items: sequenceNumbers
               .map((value) => DropdownMenuItem(
-                    child: Text(
-                      '$value',
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
-                    value: value,
-                  ))
+            child: Text(
+              '$value',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            value: value,
+          ))
               .toList(),
           hint: Align(
             alignment: Alignment.center,
@@ -462,12 +375,26 @@ final imageTypeFeild = ImageHere();
                     SizedBox(
                       height: 25,
                     ),
+
+                    _image != null
+                        ? Image.file(
+                      File(_image!.path),
+                      width: 200.0,
+                      height: 200.0,
+                      fit: BoxFit.fitHeight,
+                    )
+                        : Container(),
+                    SizedBox(
+                      height: 25,
+                    ),
+
+                    Text('PICK IMAGE FROM:'),
                     imageTypeFeild,
+
                     SizedBox(
                       height: 25,
                     ),
                     signUpButton,
-
                   ],
                 ),
               ),
@@ -506,6 +433,7 @@ final imageTypeFeild = ImageHere();
     userModel.collegeName = collegeEditingcontroller.text;
     userModel.year = int.parse("$selectedYear");
     userModel.userType = usertypeValue.toString();
+    userModel.imgURL = imageUrl;
 //
     await firebaseFirestore
         .collection("users")
@@ -516,7 +444,6 @@ final imageTypeFeild = ImageHere();
     Navigator.pushAndRemoveUntil(
         (context),
         MaterialPageRoute(builder: (context) => HomeScreen()),
-        (route) => false);
+            (route) => false);
   }
-
 }

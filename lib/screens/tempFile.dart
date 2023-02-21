@@ -1,197 +1,23 @@
-// import 'dart:io';
-//
-// import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-//
-//
-// class TempFile extends StatefulWidget {
-//   const TempFile({Key? key}) : super(key: key);
-//
-//   @override
-//   State<TempFile> createState() => _TempFileState();
-// }
-//
-// class _TempFileState extends State<TempFile> {
-//   File? imgFile;
-//   final imgPicker = ImagePicker();
-//   var uploadImageResult;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body:Center(
-//         child: InkWell(
-//           onTap: () {
-//             showOptionsDialog(context);
-//           },
-//           child: Text(
-//             "Add Picture",),
-//           ),
-//         ),
-//       );
-//   }
-//   Future<void> showOptionsDialog(BuildContext context) {
-//     return showDialog(
-//         context: context,
-//         builder: (BuildContext context) {
-//           return AlertDialog(
-//             title: Text(
-//               "Choose your option",
-//             ),
-//             content: SingleChildScrollView(
-//               child: ListBody(
-//                 children: [
-//                   GestureDetector(
-//                     onTap: () {
-//                       openCamera().then((value) {
-//                         setState(() {
-//                           print("Upload image");
-//                         });
-//                       });
-//                     },
-//                     child: Row(
-//                       children: [
-//                         Icon(
-//                           Icons.camera_alt_rounded,
-//                           size: 22,
-//                         ),
-//                         SizedBox(
-//                           width: 5,
-//                         ),
-//                         Text(
-//                           "Capture Image From Camera",
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                   Padding(padding: EdgeInsets.all(10)),
-//                   GestureDetector(
-//                     onTap: () {
-//                       openGallery().then((value) {
-//                         setState(() {
-//                           debugPrint("Upload Image==");
-//                         });
-//                       });
-//                     },
-//                     child: Row(
-//                       children: [
-//                         const Icon(
-//                           Icons.image,
-//                           size: 23,
-//                         ),
-//                         SizedBox(
-//                           width: 5,
-//                         ),
-//                         Text("Take Image From Gallery"),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         });
-//   }
-//
-//   Future openCamera() async {
-//     var imgCamera = await imgPicker.getImage(source: ImageSource.camera);
-//     setState(() {
-//       imgFile = File(imgCamera!.path);
-//     });
-//     Navigator.of(context).pop();
-//   }
-//
-//   Future openGallery() async {
-//     var imgGallery = await imgPicker.getImage(source: ImageSource.gallery);
-//     setState(() {
-//       imgFile = File(imgGallery!.path);
-//     });
-//     Navigator.of(context).pop();
-//   }
-//
-//   Widget displayImage() {
-//     if (imgFile == null) {
-//       return const CircleAvatar(
-//         radius: 50,
-//         child: CircleAvatar(
-//           backgroundImage: AssetImage("assets/images/profileImage.png"),
-//           radius: 50,
-//         ),
-//       );
-//     } else {
-//       return CircleAvatar(
-//         radius: 50,
-//         child: CircleAvatar(
-//           backgroundImage: FileImage(imgFile!),
-//           radius: 50,
-//         ),
-//       );
-//     }
-//   }
-// }
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 enum ImageSourceType { gallery, camera }
 
-class ImageHere extends StatelessWidget {
-  void _handleURLButtonPress(BuildContext context, var type) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ImageFromGalleryEx(type)));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Image Picker Example"),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              MaterialButton(
-                color: Colors.blue,
-                child: Text(
-                  "Pick Image from Gallery",
-                  style: TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  _handleURLButtonPress(context, ImageSourceType.gallery);
-                },
-              ),
-              MaterialButton(
-                color: Colors.blue,
-                child: Text(
-                  "Pick Image from Camera",
-                  style: TextStyle(
-                      color: Colors.white70, fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  _handleURLButtonPress(context, ImageSourceType.camera);
-                },
-              ),
-            ],
-          ),
-        ));
-  }
-}
-
 class ImageFromGalleryEx extends StatefulWidget {
   final type;
-  ImageFromGalleryEx(this.type);
+  final Function(XFile image,String imgUrl) func;
+  ImageFromGalleryEx(this.type, this.func);
 
   @override
-  ImageFromGalleryExState createState() => ImageFromGalleryExState(this.type);
+  ImageFromGalleryExState createState() => ImageFromGalleryExState();
 }
 
 class ImageFromGalleryExState extends State<ImageFromGalleryEx> {
-  var _image;
+  File? _image;
   var imagePicker;
-  var type;
-
-  ImageFromGalleryExState(this.type);
 
   @override
   void initState() {
@@ -203,140 +29,107 @@ class ImageFromGalleryExState extends State<ImageFromGalleryEx> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: Text(type == ImageSourceType.camera
-              ? "Image from Camera"
-              : "Image from Gallery")),
-      body: Column(
-        children: <Widget>[
-          SizedBox(
-            height: 52,
-          ),
-          Center(
-            child: GestureDetector(
-              onTap: () async {
-                var source = type == ImageSourceType.camera
-                    ? ImageSource.camera
-                    : ImageSource.gallery;
-                XFile image = await imagePicker.pickImage(
-                    source: source, imageQuality: 50, preferredCameraDevice: CameraDevice.front);
-                setState(() {
-                  _image = File(image.path);
-                });
-              },
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                    color: Colors.red[200]),
-                child: _image != null
-                    ? Image.file(
-                  _image,
-                  width: 200.0,
-                  height: 200.0,
-                  fit: BoxFit.fitHeight,
-                )
-                    : Container(
-                  decoration: BoxDecoration(
-                      color: Colors.red[200]),
-                  width: 200,
-                  height: 200,
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.grey[800],
+    return Column(
+      children: <Widget>[
+        SizedBox(height: 20),
+        Center(
+          child: GestureDetector(
+            onTap: () async {
+              var source = widget.type == ImageSourceType.camera
+                  ? ImageSource.camera
+                  : ImageSource.gallery;
+              XFile image = await imagePicker.pickImage(
+                  source: source,
+                  imageQuality: 50,
+                  preferredCameraDevice: CameraDevice.front);
+              setState(() {
+                _image = File(image.path);
+                uploadImage();
+              });
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(color: Colors.red[200]),
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.red[200]),
+                    width: 200,
+                    height: 200,
+                    child: Icon(
+                      widget.type == ImageSourceType.camera
+                          ? Icons.camera_alt
+                          : Icons.browse_gallery,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ),
-              ),
+                Text(
+                  widget.type == ImageSourceType.camera ? 'Camera' : 'Gallery',
+                )
+              ],
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key ?key,required this.title}) : super(key: key);
+  uploadImage() async {
+    try {
+      firebase_storage.UploadTask task =
+      await uploadImageToTheFirebase(_image!);
+      if (task != null) {
+        // if (mounted) {
+        //   setState(() {
+        //     _uploadTasks = [..._uploadTasks, task];
+        //   });
+        // }
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+        uploadImageToTheFirebase(_image!);
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+        task.whenComplete(() async {
+          String finalUrl = await getUrl(task.snapshot.ref);
+          widget.func(XFile(_image!.path),finalUrl);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+  Future<firebase_storage.UploadTask> uploadImageToTheFirebase(
+      File file) async {
+    if (file == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('No file was selected'),
+      ));
+    }
+
+    firebase_storage.UploadTask uploadTask;
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('images')
+        .child('/' + file.path.split('/').last);
+
+    final metadata = firebase_storage.SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'picked-file-path': file.path});
+
+    uploadTask = ref.putFile(file, metadata);
+
+    return Future.value(uploadTask);
+  }
+
+  Future<String> getUrl(firebase_storage.Reference ref) async {
+    try {
+      final link = await ref.getDownloadURL();
+      return link;
+    } catch (e) {
+      getUrl(ref);
+    }
+    return '';
   }
 }

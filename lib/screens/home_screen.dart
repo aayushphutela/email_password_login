@@ -87,6 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 15,
               ),
+              Image.network(
+                loggedInUser.imgURL!,
+                height: 150,
+              ),
+              SizedBox(
+                height: 15,
+              ),
               ActionChip(
                   label: Text("Logout"),
                   onPressed: () {

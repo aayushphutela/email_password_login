@@ -7,8 +7,9 @@ class UserModel {
   int? phoneNumber;
   String? collegeName;
   int? year;
+  String? imgURL;
 
-  UserModel({this.uid, this.email, this.name, this.password,this.userType,this.phoneNumber,this.collegeName,this.year});
+  UserModel({this.uid, this.email, this.name, this.password,this.userType,this.phoneNumber,this.collegeName,this.year,this.imgURL});
 
   // receiving data from server
   factory UserModel.fromMap(map) {
@@ -21,6 +22,7 @@ class UserModel {
       phoneNumber: map['phoneNumber'],
       collegeName: map['collegeName'],
       year: map['year'],
+      imgURL: map['imgURL'],
     );
   }
 
@@ -35,6 +37,7 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'collegeName': collegeName,
       'year': year,
+      'imgUrl': imgURL,
     };
   }
 }
