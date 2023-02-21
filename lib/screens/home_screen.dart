@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(
                 height: 15,
               ),
+              loggedInUser.imgURL==null? Container() :
               Image.network(
                 loggedInUser.imgURL!,
                 height: 150,

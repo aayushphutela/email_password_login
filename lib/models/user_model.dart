@@ -37,7 +37,7 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'collegeName': collegeName,
       'year': year,
-      'imgUrl': imgURL,
+      'imgURL': imgURL,
     };
   }
 }
